@@ -1,0 +1,1 @@
+python Q2.py "$@"
