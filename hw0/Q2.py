@@ -10,8 +10,8 @@ ImageB = Image.open(filenameB);
 
 width, height=ImageA.size
 
-DataA = ImageA.getdata();
-DataB = ImageB.getdata();
+DataA = ImageA.load();
+DataB = ImageB.load();
 
 ans = Image.new("RGBA",ImageA.size,color = (0,0,0,0));
 
