@@ -6,9 +6,9 @@ import csv
 import numpy as np
 
 begin = time.clock();
-data_item = ['AMB_TEMP','CH4','CO','NMHC','NO','NO2','NOx','O3','PM10','PM2.5','RAINFALL','RH','SO2','THC','WD_HR','WIND_DIREC','WIND_SPEED','WS_HR']
-b = dict.fromkeys(data_item,0.1)
-w = dict.fromkeys(data_item,np.full((9,),0.1))
+data_item = ["AMB_TEMP","CH4","CO","NMHC","NO","NO2","NOx","O3","PM10","PM2.5","RAINFALL","RH","SO2","THC","WD_HR","WIND_DIREC","WIND_SPEED","WS_HR"]
+b = dict((k,0.1) for k in data_item)
+w = dict((k,np.full((9,),0.1)) for k in data_item)
 learn_rate = 0.1
 loss = 100000000
 
@@ -62,47 +62,53 @@ def Test_Input():
 #Return : bool (success)
 #loop var : p for predict, i for param
 def Learning(learning_data):
-	b_grad = dict.fromkeys(data_item,0.0)
-	w_grad = dict.fromkeys(data_item,np.zeros(9,))
-	b_lr = dict.fromkeys(data_item,0.0)
-	w_lr = dict.fromkeys(data_item,np.zeros(9,))
+	global b
+	global w
+
+	b_grad = dict((k,0.0) for k in data_item)
+	w_grad = dict((k,np.zeros(9,)) for k in data_item)
+	b_lr = dict((k,0.0) for k in data_item)
+	w_lr = dict((k,np.zeros(9,)) for k in data_item)
 	pred = 0.0
 	loss_sum = 0.0
 	# for i in range(iteration) :
 	# 	loss_sum = 0
 	for day_data in learning_data[1:]:
 		for p in range(13,27):
-			pred = b['PM2.5']
+			pred = b["PM2.5"]
 			for i in range(9,0,-1):
-				pred = pred + w['PM2.5'][9-i]*day_data[9][p-i]
+				pred = pred + w["PM2.5"][9-i]*day_data[9][p-i]
 			pred = max(0,pred)
 			# print ('date:'+str(day_data[9][0]))
 			# print ('time:'+str(p))
 			# print ('real:'+str(day_data[9][p]))
 			# print ('pred:'+str(pred))
-			# print ('b:'+str(b['PM2.5']))
-			# print ('w:'+str(w['PM2.5']))
+			# print ('b:'+str(b["PM2.5"]))
+			# print ('w:'+str(w["PM2.5"]))
 			loss_sum = loss_sum + (day_data[9][p] - pred)**2
 			for i in range(9,0,-1):
-				w_grad['PM2.5'][9-i] = w_grad['PM2.5'][9-i] - 2*(day_data[9][p] - pred)*day_data[9][p-i]
-				w_lr['PM2.5'][9-i] = w_lr['PM2.5'][9-i] + w_grad['PM2.5'][9-i]**2
-				w['PM2.5'][9-i] = w['PM2.5'][9-i] - learn_rate/np.sqrt(w_lr['PM2.5'][9-i]) * w_grad['PM2.5'][9-i]
-			b_grad['PM2.5'] = b_grad['PM2.5'] - 2*(day_data[9][p] - pred)
-			b_lr['PM2.5'] = b_lr['PM2.5'] + b_grad['PM2.5']**2
-			b['PM2.5'] = b['PM2.5'] - learn_rate/np.sqrt(b_lr['PM2.5']) * b_grad['PM2.5'] 
+				w_grad["PM2.5"][9-i] = w_grad["PM2.5"][9-i] - 2*(day_data[9][p] - pred)*day_data[9][p-i]
+				w_lr["PM2.5"][9-i] = w_lr["PM2.5"][9-i] + w_grad["PM2.5"][9-i]**2
+				w["PM2.5"][9-i] = w["PM2.5"][9-i] - learn_rate/np.sqrt(w_lr["PM2.5"][9-i]) * w_grad["PM2.5"][9-i]
+			b_grad["PM2.5"] = b_grad["PM2.5"] - 2*(day_data[9][p] - pred)
+			b_lr["PM2.5"] = b_lr["PM2.5"] + b_grad["PM2.5"]**2
+			b["PM2.5"] = b["PM2.5"] - learn_rate/np.sqrt(b_lr["PM2.5"]) * b_grad["PM2.5"] 
 	return loss_sum/(240*14)
 
 #predict
 #Return : (Output(.csv))
 def Predict(test_data):
+	global b
+	global w
+
 	result_file = open(sys.argv[3],'w')
 	wf = csv.writer(result_file)
 	wf.writerow(['id','value'])
 	pred = 0.0
 	for id_data in test_data:
-		pred = b['PM2.5']
+		pred = b["PM2.5"]
 		for i in range(2,11):
-			pred = pred + w['PM2.5'][i-2]*id_data[9][i]
+			pred = pred + w["PM2.5"][i-2]*id_data[9][i]
 		wf.writerow([id_data[0][0],max(pred,0)])
 	result_file.close()
 	return True
@@ -121,6 +127,4 @@ while loss > 10 and (loss - last_loss > 0 or last_loss - loss > 0.0001) :
 
 print loss
 Predict(test_data)
-print b
-print w
 print ('time:' + str(time.clock()-begin))
