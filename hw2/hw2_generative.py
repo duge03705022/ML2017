@@ -17,9 +17,9 @@ def Train_Input(filename):
 	data_array[1] = [eval(v) for v in data_array[1]]
 	data_array[2] = [eval(v) for v in data_array[2]]
 	for i in data_array[1]:
-		train_data[0].append([int(k) for k in i])
+		train_data[0].append([float(k) for k in i])
 	for i in data_array[2]:
-		train_data[1].append([int(k) for k in i])
+		train_data[1].append([float(k) for k in i])
 	return train_data
 
 def Test_Input(filename):
@@ -59,10 +59,10 @@ def Predict(test_data,p,mu,com_cov,filename):
 	wf.writerow(['id','label'])
 	id_num = 1
 
-	for pre_data in test_data:
+	for pre_data in test_data[1:]:
 		class_num = -1
 		p_class = [0.0,0.0]
-		pred = 0
+		pred = 0.0
 
 		v = np.array(pre_data,dtype="float")[np.newaxis]
 		p_class[0] = np.exp(-0.5*np.dot(np.dot((v-mu[0]),com_cov.I),np.transpose(v-mu[0])))*p[0]
