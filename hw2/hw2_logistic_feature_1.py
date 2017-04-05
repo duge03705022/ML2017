@@ -27,50 +27,50 @@ def Train_Input(fileX,fileY):
 	global pro_data
 	global std
 	global mean
-	train_data = [[],[]]
+	train_data = []
 
 	train_X = open(fileX,'r')
 	raw_data_X = list(csv.reader(train_X))
 	counter = 0
-	data = [[],[]]
+	data = []
 	train_Y = open(fileY,'r')
 	for y in csv.reader(train_Y):
-		data[int(y[0])].append(raw_data_X[counter])
+		tmp_data = raw_data_X[counter][:-1]
+		tmp_data = tmp_data + y
+		data.append(tmp_data)
 		counter = counter + 1
-	for i in range(0,2):
-		for datarow in data[i]:
-			for item in datarow[:-1]:
-				item = item.replace(" ","")
-				if item.isdigit() == False:
-					sum_data[item] = sum_data.get(item,0) + 1
-					if i == 0:
-						class_data[item] = 0.0
-					if i == 1:
-						class_data[item] = class_data.get(item,0) + 1
+	for datarow in data:
+		for item in datarow[:-1]:
+			item = item.replace(" ","")
+			if item.isdigit() == False:
+				sum_data[item] = sum_data.get(item,0) + 1
+				if datarow[len(datarow)-1] == '0':
+					class_data[item] = class_data.get(item,0) + 0.0
+				if datarow[len(datarow)-1] == '1':
+					class_data[item] = class_data.get(item,0) + 1.0
 	pro_data = dict((item.replace(" ",""),float(class_data[item]/sum_data[item])) for item in sum_data.keys())
-	for i in range(0,2):
-		for datarow in data[i]:
-			row = []
-			for item in datarow[:-1]:
-				item = item.replace(" ","")
-				if item.isdigit() == False:
-					k = pro_data[item]
-					row.append(k)
-				else :
-					row.append(float(item))
-			train_data[i].append(row)
+	for datarow in data:
+		row = []
+		for item in datarow:
+			item = item.replace(" ","")
+			if item.isdigit() == False:
+				k = pro_data[item]
+				row.append(k)
+			else :
+				row.append(float(item))
+		train_data.append(row)
 	#standard
-	tmp = np.array(train_data[0]+train_data[1],dtype="float")
+	tmp = np.array(train_data,dtype="float")
 	std = np.std(tmp,axis=0)
 	mean = np.mean(tmp,axis=0)
 
-	train_data_std = [[],[]]
-	for i in range(0,2):
-		for datarow in train_data[i]:
-			row = []
-			for j in range(0,len(datarow)):
-				row.append((float(datarow[j])-mean[j])/std[j])
-			train_data_std[i].append(row)
+	train_data_std = []
+	for datarow in train_data:
+		row = []
+		for j in range(0,len(datarow)-1):
+			row.append((float(datarow[j])-mean[j])/std[j])
+		row.append(float(datarow[len(datarow)-1]))
+		train_data_std.append(row)
 
 	train_X.close()
 	train_Y.close()
@@ -84,7 +84,7 @@ def Test_Input(filename,p):
 	row = []
 
 	testfile = open(filename,'r')
-	for datarow in csv.reader(testfile):
+	for datarow in list(csv.reader(testfile))[1:]:
 		row = []
 		for i in range(0,len(datarow)):
 			item = datarow[i]
@@ -102,7 +102,7 @@ def Test_Input(filename,p):
 	testfile.close()
 	return test_data
 
-def Extract(raw_data):
+def Extract(raw_data,types):
 	global data_item
 	global data_index
 	global data_continuous
@@ -114,6 +114,8 @@ def Extract(raw_data):
 		for item in data_item:
 			if item in data_set:
 				vector.append(datarow[data_index[item]])
+		if types == 1:
+			vector.append(datarow[len(datarow)-1])
 		feature.append(vector)
 	return feature
 
@@ -130,9 +132,8 @@ def Output(feature,filename):
 #main
 train_data = Train_Input(sys.argv[1],sys.argv[2])
 feature = []
-for datarow in train_data:
-	feature.append(Extract(datarow))
-Output(feature,"generative_model.csv")
-test_data = Test_Input(sys.argv[3],float(len(train_data[1]))/(len(train_data[0])+len(train_data[1])))
-test_feature = Extract(test_data)
-Output(test_feature,"generative_test.csv")
+feature.append(Extract(train_data,1))
+Output(feature,"logistic_model.csv")
+test_data = Test_Input(sys.argv[3],mean[len(mean)-1])
+test_feature = [Extract(test_data,0)]
+Output(test_feature,"logistic_test.csv")
