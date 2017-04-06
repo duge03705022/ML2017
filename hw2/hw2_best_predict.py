@@ -36,12 +36,14 @@ def Predict(test_data,w,b,filename):
 	for pre_data in test_data:
 		prob = Sigmoid(np.dot(np.array(pre_data,dtype="float")[np.newaxis],w) + b)
 		pred = round(prob,0)
+		# print prob,pred
 		wf.writerow([id_num,int(pred)])
 		id_num = id_num + 1
 	result_file.close()
 	return 
 
+
 #main
-w,b = Param_Input("logistic_params.csv")
-test_data = Test_Input("logistic_test.csv")
+w,b = Param_Input("best_params.csv")
+test_data = Test_Input("best_test.csv")
 Predict(test_data,w,b,sys.argv[1])

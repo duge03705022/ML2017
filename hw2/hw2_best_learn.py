@@ -101,11 +101,11 @@ def Output(filename):
 	return
 
 #main
-train_data = Train_Input("logistic_model.csv")
-w_inv = []
-for i in range(0,data_item_len):
-	w_inv.append(1.0/data_item_len)
-b_inv = 0
+train_data = Train_Input("best_model.csv")
+w_inv = [ 0.19476849, 0.099294, 0.07642653, 0.51970695, 0.24690609, 0.8059482 , 0.44845691, 0.41664584, 0.03849523, 0.07968778, 0.50106454, 0.32029853, 0.23022329, 0.09425557]
+for i in range(0,data_item_len/2):
+	w_inv.append(1.0/data_item_len/2)
+b_inv = -1.92846269
 Init(w_inv,b_inv)
 Learning(train_data)
-Output("logistic_params.csv")
+Output("best_params.csv")
