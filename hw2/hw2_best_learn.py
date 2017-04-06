@@ -2,7 +2,6 @@ import sys
 import csv
 import numpy as np
 
-begin = time.clock();
 global data_item
 global data_index
 global data_item_len
@@ -43,7 +42,7 @@ def Init(w_inv,b_inv):
 	w = np.array(w_inv).reshape(data_item_len,1)
 	learn_rate = 0.5
 	loss = 100000000
-	dist = 0.1
+	dist = 10
 	return
 
 def Learning(train_data):
@@ -86,7 +85,6 @@ def Learning(train_data):
 			b_lr = b_lr + b_grad**2.0
 			b = b - learn_rate/np.sqrt(b_lr+avoid_bound) * b_grad
 		loss = loss_sum
-		print (last_loss,loss)
 	return
 
 def Output(filename):
