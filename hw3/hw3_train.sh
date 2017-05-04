@@ -1,0 +1,1 @@
+python2 hw3_train_CNN.py "$1" 
