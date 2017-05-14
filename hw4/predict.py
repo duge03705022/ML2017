@@ -1,5 +1,6 @@
 import numpy as np
 import csv
+import sys
 from sklearn.svm import LinearSVR as SVR
 from gen import get_eigenvalues
 
@@ -19,7 +20,7 @@ svr.fit(X, y)
 # svr.set_params() to restore the parameters
 
 # predict
-testdata = np.load('data.npz')
+testdata = np.load(sys.argv[1])
 test_X = []
 for i in range(200):
     data = testdata[str(i)]
@@ -29,7 +30,7 @@ for i in range(200):
 test_X = np.array(test_X)
 pred_y = svr.predict(test_X)
 
-f = open('ans.csv', 'w')
+f = open(sys.argv[2], 'w')
 wf = csv.writer(f)
 wf.writerow(["SetId","LogDim"])
 for i, d in enumerate(pred_y):
