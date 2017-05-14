@@ -9,7 +9,7 @@ if sys.argv[1]=="train":
     MIN_COUNT = 5
     WORDVEC_DIM = 100
     WINDOW = 5
-    NEGATIVE_SAMPLES = 0
+    NEGATIVE_SAMPLES = 5
     ITERATIONS = 0
     MODEL = 1
     LEARNING_RATE = 0.025
