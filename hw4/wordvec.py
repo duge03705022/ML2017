@@ -1,29 +1,9 @@
-# from argparse import ArgumentParser
-
-
 import word2vec
 import numpy as np
 import nltk
 import sys
 
-
-# parser = ArgumentParser()
-# parser.add_argument('--train', action='store_true',
-#                     help='Set this flag to train word2vec model')
-# parser.add_argument('--corpus-path', type=str, default='hp/all',
-#                     help='Text file for training')
-# parser.add_argument('--model-path', type=str, default='hp/model.bin',
-#                     help='Path to save word2vec model')
-# parser.add_argument('--plot-num', type=int, default=500,
-#                     help='Number of words to perform dimensionality reduction')
-# args = parser.parse_args()
-
-# train - train data_path model_output
-# load - model_path plot-num
-
-
 if sys.argv[1]=="train":
-    # DEFINE your parameters for training
     print("Phrasing starts")
 
     MIN_COUNT = 5
@@ -62,19 +42,13 @@ else:
     vecs = np.array(vecs)[:int(sys.argv[2])]
     vocabs = vocabs[:int(sys.argv[2])]
 
-    '''
-    Dimensionality Reduction
-    '''
-    # from sklearn.decomposition import PCA
+    
     from sklearn.manifold import TSNE
 
     tsne = TSNE(n_components=2)
     reduced = tsne.fit_transform(vecs)
 
 
-    '''
-    Plotting
-    '''
     import matplotlib.pyplot as plt
     from adjustText import adjust_text
 
