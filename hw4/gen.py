@@ -59,7 +59,6 @@ X = []
 y = []
 for i in range(60):
     dim = i + 1
-    print(i)
     for N in [10000, 20000, 50000, 80000, 100000]:
         layer_dims = [np.random.randint(60, 80), 100]
         data = gen_data(dim, layer_dims, N).astype('float32')
