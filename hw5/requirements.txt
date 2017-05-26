@@ -1,0 +1,17 @@
+####### requirements.txt #######
+
+###### Requirements without Version Specifiers ######
+
+sklearn
+
+###### Requirements with Version Specifiers ######
+
+numpy >= 1.12.1
+h5py >= 2.7.0
+
+###### Refer to other requirements files ######
+
+###### A particular file ######
+
+###### Additional Requirements without Version Specifiers ######
+
