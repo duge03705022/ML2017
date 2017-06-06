@@ -94,8 +94,8 @@ out_path = sys.argv[2]
 split_ratio = 0.3
 input_dims = 25
 dense_num = 100
-nb_epoch = 1000
-batch_size = 500
+nb_epoch = 10000
+batch_size = 1000
 
 ### input
 print("Get movie, user data")
@@ -109,21 +109,22 @@ test_vecs,test_movie,test_user = test_input(data_path+"test.csv",movieid_mapping
 #build model
 movie_input = keras.layers.Input(shape=[1])
 movie_vec = keras.layers.Flatten()(
-	keras.layers.Embedding(n_movie, input_dims , embeddings_initializer = 'Orthogonal')(movie_input))
+	keras.layers.Embedding(n_movie, input_dims , embeddings_initializer = 'RandomNormal')(movie_input))
 
 user_input = keras.layers.Input(shape=[1])
 user_vec = keras.layers.Flatten()(
-	keras.layers.Embedding(n_user, input_dims , embeddings_initializer = 'Orthogonal')(user_input))
+	keras.layers.Embedding(n_user, input_dims , embeddings_initializer = 'RandomNormal')(user_input))
 
-input_vecs = keras.layers.Concatenate()([movie_vec, user_vec])
-nn = keras.layers.Dense(dense_num*3, activation='relu')(input_vecs)
+user_bias = keras.layers.Flatten()(
+	keras.layers.Embedding(n_user, 1 , embeddings_initializer = 'zeros')(user_input))
 
-nn = keras.layers.Dense(dense_num*2, activation='relu')(nn)
-nn = keras.layers.Dense(dense_num, activation='relu')(nn)
+movie_bias = keras.layers.Flatten()(
+	keras.layers.Embedding(n_movie, 1 , embeddings_initializer = 'zeros')(movie_input))
 
-result = keras.layers.Dense(1, activation='relu')(nn)
+r = keras.layers.Dot(axes=1)([user_vec,movie_vec])
+r = keras.layers.Add()([r,user_bias,movie_bias])
 
-model = kmodels.Model([movie_input, user_input], result)
+model = kmodels.Model([movie_input, user_input], r)
 model.summary()
 model.compile(loss='mean_squared_error',
                   optimizer='sgd',
@@ -150,6 +151,7 @@ score = model.evaluate([val_movie,val_user], Y_val)
 model.save("model/%s.h5" % str(score[2]))
 
 Y_pred = model.predict([test_movie,test_user],verbose=1)
+
 out = open(out_path,'w')
 csvw = csv.writer(out)
 csvw.writerow(["TestDataID","Rating"])
