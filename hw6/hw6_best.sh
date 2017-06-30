@@ -1,0 +1,1 @@
+python3.5 test.py "$1" "$2" model/DNN_model.h5
